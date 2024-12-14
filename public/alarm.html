@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>알람 설정 페이지</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html {
+        font-family: "Caveat", cursive, sans-serif;
+        background-color: #fcfce3;
+        background-image: linear-gradient(
+          to bottom,
+          #e5e5e5 1px,
+          transparent 1px
+        );
+        background-size: 100% 30px; /* 공책 줄 간격 */
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+        min-height: 100%;
+      }
+      h1 {
+        margin: 30px 0; /* 위아래 여백을 20px로 설정 */
+        font-size: 36px;
+        color: #333;
+      }
+
+      input[type="time"],
+      button {
+        margin: 20px 0; /* 위아래 여백을 10px로 설정 */
+        padding: 20px;
+        font-size: 26px;
+        border: 2px solid #000;
+        border-radius: 5px;
+        background-color: #fff;
+        color: #000;
+      }
+
+      button {
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+      }
+
+      button:hover {
+        background-color: #000; /* 밝은 주황색 배경 */
+        color: #fff; /* 흰색 글자 */
+      }
+
+      .back-button {
+        margin-right: 20px;
+        padding: 10px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px; /* 아이콘 크기 */
+        color: #333;
+        transition: color 0.3s;
+      }
+
+      .back-button:hover {
+        color: #f97272; /* 마우스 오버 시 연한 주황색 */
+      }
+
+      #customAlert {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        justify-content: center;
+        align-items: center;
+      }
+
+      #customAlertContent {
+        background-color: #fff; /* 알람 내용 배경 색상 */
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+      }
+
+      #customAlert button {
+        margin-top: 10px;
+        padding: 10px;
+        border: none;
+        background-color: #f1c1a1; /* 연한 주황색 버튼 */
+        color: #fff; /* 흰색 글자 */
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      #customAlert button:hover {
+        background-color: #f2d1b3; /* 밝은 주황색 */
+      }
+      .footer {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px 0;
+        width: 100%;
+        max-width: 400px;
+        margin: 30px 0;
+      }
+      .icon {
+        text-align: center;
+        margin-right: -20px;
+      }
+      .icon:last-child {
+        margin-right: 0; /* 마지막 아이콘은 오른쪽 간격을 없앰 */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>알람을 설정하시오</h1>
+    <input type="time" id="alarmTime" required />
+    <button id="setAlarm">알람 설정</button>
+
+    <div class="alert" id="alertMessage"></div>
+    <div class="footer">
+      <div class="icon">
+        <a href="test2.html"><img src="calendar-2-line.png" /></a>
+      </div>
+      <div class="icon">
+        <a href="medicine.html"><img src="capsule-fill.png" /></a>
+      </div>
+      <div class="icon">
+        <a href="search.html"><img src="search-line.png" /></a>
+      </div>
+      <div class="icon">
+        <a href="mypage.html"><img src="user-fill.png" /></a>
+      </div>
+    </div>
+    <!-- 커스텀 팝업 -->
+    <div id="customAlert">
+      <div id="customAlertContent">
+        <p id="alertMessage">약 드실 시간입니다!</p>
+        <button onclick="closeCustomAlert()">확인</button>
+      </div>
+    </div>
+
+    <!-- 오디오 파일 삽입 -->
+    <audio id="alarmSound" src="alarm_sound.mp4"></audio>
+
+    <script>
+      let dailyAlarm; // 매일 알람을 위한 변수
+
+      document.getElementById("setAlarm").onclick = function () {
+        const alarmTime = document.getElementById("alarmTime").value;
+        if (!alarmTime) {
+          alert("알람 시간을 설정하세요.");
+          return;
+        }
+
+        // 기존 알람 비활성화
+        clearTimeout(dailyAlarm);
+
+        // 알람 설정
+        setDailyAlarm(alarmTime);
+
+        alert("알람이 설정되었습니다.");
+      };
+
+      function setDailyAlarm(alarmTime) {
+        const now = new Date();
+        const [hours, minutes] = alarmTime.split(":").map(Number);
+
+        let alarmDate = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          hours,
+          minutes,
+          0
+        );
+
+        // 알람 시간이 현재 시간보다 이전이라면 다음날로 설정
+        if (alarmDate <= now) {
+          alarmDate.setDate(alarmDate.getDate() + 1);
+        }
+
+        const timeToAlarm = alarmDate - now;
+
+        // 다음 알람 설정
+        dailyAlarm = setTimeout(() => {
+          // 알람 울림
+          document.getElementById("customAlert").style.display = "flex";
+          document.getElementById("alarmSound").play();
+        }, timeToAlarm);
+      }
+
+      function closeCustomAlert() {
+        document.getElementById("customAlert").style.display = "none";
+        document.getElementById("alarmSound").pause(); // 소리 중지
+        document.getElementById("alarmSound").currentTime = 0; // 재생 위치 초기화
+
+        // 다음날 알람 설정
+        const alarmTime = document.getElementById("alarmTime").value;
+        setDailyAlarm(alarmTime); // 알람을 다음날로 설정
+      }
+    </script>
+  </body>
+</html>

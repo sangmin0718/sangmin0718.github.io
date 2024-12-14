@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DM 검색 기능</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      html {
+        font-family: "Caveat", cursive, sans-serif;
+        background-color: #fcfce3;
+        background-image: linear-gradient(
+          to bottom,
+          #e5e5e5 1px,
+          transparent 1px
+        );
+        background-size: 100% 30px; /* 공책 줄 간격 */
+        height: 100%;
+      }
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        padding: 20px;
+        min-height: 100%;
+      }
+      h2 {
+        margin-bottom: 20px;
+      }
+      .settings-icon {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+      }
+      .settings-icon img {
+        width: 100%;
+        height: 100%;
+      }
+      /* 검색 입력과 버튼 스타일 */
+      #search-container {
+        margin-bottom: 20px;
+      }
+      #search-input {
+        padding: 10px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-right: 10px;
+        font-size: 16px;
+      }
+      button {
+        padding: 10px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      button:hover {
+        background-color: #0056b3;
+      }
+      /* 채팅 창 스타일 */
+      #chat-container {
+        width: 300px;
+        height: 400px;
+        overflow-y: scroll;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: white;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      /* 메시지 스타일 */
+      .message {
+        padding: 8px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #f1f1f1;
+        transition: background-color 0.3s;
+      }
+      /* 검색된 메시지 강조 스타일 */
+      .highlight {
+        background-color: yellow;
+      }
+      /* 날짜 텍스트 스타일 */
+      .date {
+        font-size: 0.8em;
+        color: #888;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-around;
+        padding: 55px 0;
+        width: 100%;
+        max-width: 400px;
+      }
+      .icon {
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="settings-icon">
+      <img src="settings-4-fill.png" />
+    </div>
+    <h2>DM 검색 기능</h2>
+
+    <!-- 검색 입력과 버튼 -->
+    <div id="search-container">
+      <input type="text" id="search-input" placeholder="검색어를 입력하세요" />
+      <button onclick="searchMessage()">검색</button>
+    </div>
+
+    <!-- 채팅 기록 영역 -->
+    <div id="chat-container">
+      <!-- 기존 메시지들 -->
+
+      <!-- 일기 메시지 추가 -->
+      <div class="message" id="diary-message">
+        <span id="diary-message-text"></span>
+        <span class="date">오늘</span>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="icon">
+        <a href="test2.html"><img src="calendar-2-line.png" /></a>
+      </div>
+      <div class="icon">
+        <a href="alarm.html"><img src="capsule-fill.png" /></a>
+      </div>
+      <div class="icon">
+        <a href="search.html"><img src="search-line.png" /></a>
+      </div>
+      <div class="icon">
+        <a href="mypage.html"><img src="user-fill.png" /></a>
+      </div>
+    </div>
+
+    <script>
+      window.onload = function () {
+        const diaryContainer = document.getElementById("chat-container"); // 채팅 컨테이너
+        const existingDiaries =
+          JSON.parse(localStorage.getItem("dailyDiaries")) || []; // 저장된 일기들 가져오기
+
+        // 일기들을 DOM에 숨기고 저장
+        existingDiaries.forEach((diary) => {
+          const diaryElement = document.createElement("div");
+          diaryElement.className = "message"; // 메시지 스타일 적용
+
+          // 저장된 날짜 사용
+          let formattedDate = diary.date; // 저장된 날짜 사용
+
+          // 날짜 띄어쓰기 처리 (예: 2024.12.9 -> 2024. 12. 9)
+          const dateParts = formattedDate.split("."); // 날짜를 '.' 기준으로 분리
+          formattedDate = dateParts.join(". "); // '.' 뒤에 공백 추가
+
+          // 일기에 날짜 추가
+          diaryElement.innerHTML = `<span>${diary.text}</span><span class="date">${formattedDate}</span>`;
+          diaryElement.style.display = "none"; // 기본적으로 숨기기
+          diaryContainer.appendChild(diaryElement);
+        });
+      };
+
+      function searchMessage() {
+        const keyword = document.getElementById("search-input").value; // 검색어 가져오기
+        const messages = document.querySelectorAll(".message"); // 모든 메시지 요소 선택
+        let firstMatch = null; // 첫 번째 일치 메시지를 위한 변수
+
+        // 이전 검색 강조 표시 제거
+        messages.forEach((message) => {
+          message.classList.remove("highlight");
+          message.style.display = "none"; // 검색 결과만 보이도록 숨기기
+        });
+
+        // 검색어와 일치하는 메시지만 표시
+        messages.forEach((message) => {
+          if (message.innerText.includes(keyword)) {
+            message.style.display = "block"; // 일치하는 메시지만 보이게
+            message.classList.add("highlight"); // 검색 결과 강조 표시
+            if (!firstMatch) {
+              firstMatch = message; // 첫 번째 일치하는 메시지 저장
+            }
+
+            // 날짜 띄어쓰기 처리 (예: 2024.12.9 -> 2024. 12. 9)
+            const dateSpan = message.querySelector(".date");
+            if (dateSpan) {
+              const originalDate = dateSpan.innerText;
+              const dateParts = originalDate.split("."); // 날짜를 '.' 기준으로 분리
+              const formattedDate = dateParts.join(". "); // '.' 뒤에 공백 추가
+              dateSpan.innerText = formattedDate; // 날짜에 띄어쓰기를 추가한 형태로 업데이트
+            }
+          }
+        });
+
+        // 첫 번째 일치하는 메시지로 스크롤 이동
+        if (firstMatch) {
+          document.getElementById("chat-container").scrollTo({
+            top: firstMatch.offsetTop,
+            behavior: "smooth",
+          });
+        } else {
+          alert("검색어를 포함하는 메시지를 찾을 수 없습니다.");
+        }
+      }
+    </script>
+  </body>
+</html>

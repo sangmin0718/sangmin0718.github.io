@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>종합 일기 작성</title>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Caveat", cursive, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #fcfce3;
+        background-image: linear-gradient(
+          to bottom,
+          #e5e5e5 1px,
+          transparent 1px
+        ); /* 배경에 줄 추가 */
+        background-size: 100% 30px; /* 공책 줄 간격 */
+        margin: 0;
+        padding: 20px;
+      }
+
+      .date-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 30px;
+      }
+      .back-button {
+        margin-right: 20px;
+        padding: 10px;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        font-size: 24px; /* 아이콘 크기 조정 */
+        color: #333;
+        transition: color 0.3s;
+      }
+
+      .back-button:hover {
+        color: #f1c1a1; /* 마우스 오버 시 색상 변경 */
+      }
+      .section {
+        margin-bottom: 30px;
+        padding: 20px;
+        background-color: transparent; /* 배경을 투명하게 설정 */
+        border-radius: 8px;
+        background-image: inherit; /* body의 배경 이미지를 상속 */
+        background-size: inherit; /* body의 배경 크기를 상속 */
+      }
+
+      h2,
+      h3 {
+        margin-bottom: 10px;
+      }
+
+      label,
+      textarea,
+      input {
+        display: block;
+        width: 100%;
+        margin-bottom: 15px;
+        font-size: 16px;
+      }
+
+      textarea {
+        height: 100px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        resize: none;
+      }
+
+      .image-selector {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .image-selector img {
+        width: 100px;
+        height: 100px;
+        cursor: pointer;
+        border-radius: 10px;
+        border: 3px solid transparent;
+        transition: transform 0.3s, border-color 0.3s;
+      }
+
+      .image-selector img:hover {
+        transform: scale(1.2);
+        border-color: #f1c1a1;
+      }
+
+      .image-selector img.selected {
+        border-color: #f1c1a1;
+      }
+
+      button {
+        width: 100%;
+        padding: 10px;
+        background-color: #f1c1a1;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 18px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #f2d1b3;
+      }
+
+      .file-upload-label {
+        display: block;
+        width: 100%;
+        height: 200px;
+        background-color: #ffffff;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        text-align: center;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .file-upload-label img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+        padding-top: 40px;
+      }
+
+      .file-upload-label[data-selected="true"] img {
+        display: none;
+      }
+
+      .message {
+        margin-top: 15px;
+        text-align: center;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Section 1: 오늘의 날짜 -->
+      <div class="section">
+        <div class="date-container">
+          <a href="test2.html">
+            <button class="back-button">
+              <i class="fas fa-arrow-left"></i>
+            </button>
+          </a>
+          <h1 id="selectedDate"></h1>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>오늘 날씨는 어땠나요?</h2>
+        <div class="image-selector" id="weatherSelector">
+          <img src="sunny.png" alt="맑음" data-weather="맑음" />
+          <img src="cloudy.png" alt="흐림" data-weather="흐림" />
+          <img src="windy.png" alt="바람" data-weather="바람" />
+          <img src="rainy.png" alt="비" data-weather="비" />
+          <img src="snowy.png" alt="눈" data-weather="눈" />
+        </div>
+      </div>
+
+      <!-- Section 5: 기분 선택 -->
+      <div class="section">
+        <h2>오늘 기분은 어땠나요?</h2>
+        <div class="image-selector" id="moodSelector">
+          <img src="happy.png" alt="매우좋음" data-mood="매우좋음" />
+          <img src="good.png" alt="좋음" data-mood="좋음" />
+          <img src="soso.png" alt="보통" data-mood="보통" />
+          <img src="sad.png" alt="슬픔" data-mood="슬픔" />
+          <img src="angry.png" alt="화남" data-mood="화남" />
+        </div>
+      </div>
+
+      <!-- Section 2: 수면 시간 -->
+      <div class="section">
+        <h2>수면 시간</h2>
+        <label for="wake-up-time">기상 시간:</label>
+        <input type="time" id="wake-up-time" name="wake-up-time" />
+        <label for="sleep-time">취침 시간:</label>
+        <input type="time" id="sleep-time" name="sleep-time" />
+      </div>
+
+      <!-- Section 3: 오늘 먹은 음식 -->
+      <div class="section">
+        <h2>오늘은 무엇을 드셨나요?</h2>
+        <textarea
+          id="meal"
+          placeholder="오늘 드신 음식을 적어주세요."
+        ></textarea>
+      </div>
+
+      <!-- Section 6: 3줄 일기 -->
+
+      <div class="section">
+        <h2>3줄 일기</h2>
+        <textarea
+          id="daily-summary"
+          placeholder="일기를 작성하세요..."
+        ></textarea>
+        <!-- 저장 버튼 -->
+        <button id="save-diary-button" onclick="saveDiary()">저장</button>
+      </div>
+      <!-- Section 7: 랜덤 질문 -->
+      <div class="section">
+        <h2>오늘의 질문</h2>
+        <p id="randomQuestion">내 삶의 목적은 무엇인가?</p>
+        <textarea id="answer" placeholder="답변을 입력해주세요."></textarea>
+      </div>
+
+      <!-- Section 8: 오늘의 사진 -->
+      <div class="section">
+        <h2>오늘의 사진</h2>
+        <label for="imageUpload" class="file-upload-label" id="imageButton">
+          <img src="camera.png" alt="사진 추가" />
+        </label>
+        <input
+          type="file"
+          id="imageUpload"
+          accept="image/*"
+          style="display: none"
+        />
+      </div>
+
+      <!-- 저장 버튼 -->
+      <button id="save-btn">작성 완료</button>
+      <div class="message" id="message"></div>
+    </div>
+
+    <script>
+      function saveDiary() {
+        const diaryText = document.getElementById("daily-summary").value; // 일기 내용 가져오기
+        if (diaryText.trim() === "") {
+          alert("일기를 작성해주세요!");
+          return;
+        }
+
+        const currentDate = new Date().toLocaleDateString(); // 현재 날짜 가져오기
+        const newDiary = { date: currentDate, text: diaryText }; // 날짜와 내용을 객체로 저장
+
+        // 기존 데이터를 가져오고 배열로 변환
+        const existingDiaries =
+          JSON.parse(localStorage.getItem("dailyDiaries")) || [];
+        existingDiaries.push(newDiary); // 새 일기 추가
+
+        // 업데이트된 배열을 다시 localStorage에 저장
+        localStorage.setItem("dailyDiaries", JSON.stringify(existingDiaries));
+        alert("일기가 저장되었습니다!");
+      }
+      const urlParams = new URLSearchParams(window.location.search);
+      const selectedDate = urlParams.get("date"); // 'date' 파라미터 값
+
+      // 가져온 날짜를 화면에 표시
+      if (selectedDate) {
+        const dateElement = document.getElementById("selectedDate");
+        dateElement.textContent = "선택된 날짜: " + selectedDate;
+      } else {
+        console.log("날짜 파라미터가 없습니다.");
+      }
+      // 랜덤 질문
+      const randomQuestions = [
+        "내 삶의 목적은 무엇인가?",
+        "현재 읽고 있는 글이나 책이 있다면?",
+        "가장 최근에 방문한 식당은? 무엇을 먹었는가?",
+        "오늘 하루가 힘들었던 이유는 무엇인가?",
+        "오늘은 평범한 하루였는가? 그렇거나 그렇지 않은 이유는?",
+        "가장 좋아하는 액세서리는?",
+        "다음에 여행하고 싶은 곳은 어디인가?",
+        "가장 자신 있게 만들 수 있는 요리는?",
+        "오늘 입은 옷차림 중에서 가장 오래된 것은?",
+        "최근 꾼 꿈 중에 인상적인 것은?",
+        "몹시 기다려지는 일이 있는가?",
+        "오늘 더 필요했던 것은?",
+        "오늘의 나를 한 단어로 표현한다면? (나비, 구름, 바람)",
+        "마지막으로 본 TV 프로그램은?",
+        "내일은 무엇을 할 계획인가?",
+        "누구와 함께 사는가?",
+        "오늘 하루 슬퍼할 일이 있었는가? 그 강도를 1에서 10으로 표현한다면?",
+        "지금 밖의 날씨는 어떤가?",
+        "친구란 무엇인가?",
+        "당장 갖고 싶은 세 가지가 있다면?",
+        "만 원을 가장 알차게 쓸 수 있는 방법은 무엇일까?",
+        "오늘 하루를 동물에 비유한다면? 그 이유는 무엇인가?",
+        "사람들에게 가장 즐겨하는 질문은 무엇인가?",
+        "지금 사랑하고 있는가?",
+        "상처받은 마음을 치유하는 나만의 방법을 적어보자.",
+        "마지막으로 들은 노래는?",
+        "오늘 하루 벌어진 일 중에서 바꾸고 싶은 게 있다면?",
+        "내가 아는 가장 이상한 사람은 누구인가?",
+        "오늘 가장 많이 사용한 말은?",
+        "오늘 가장 두드러진 감정은 무엇인가?",
+        "절대로 버릴 수 없는 물건을 하나만 적어보자.",
+        "오늘 있었던 일 중 후회하는 것은?",
+        "오늘 나의 하루는 짠맛인가, 달달한 맛인가?",
+        "자식에게 하고 싶은 질문은?",
+        "가장 좋아하는 단어는?",
+        "어디에 사는가?",
+        "하루에 한 시간이 늘어난다면 무엇을 할 것인가?",
+        "아무에게도 하고 싶지 않은 이야기가 있는가?",
+        "지금 당장 사고 싶은 물건은?",
+        "오늘 처음 시도해본 활동이 있다면?",
+        "마지막으로 읽은 책은?",
+        "오늘 가장 먼저 먹은 음식은?",
+        "오늘의 뉴스 기사를 하나 적어보자",
+        "오늘 떠올린 생각 중에 가장 엉뚱한 것은?",
+        "오늘 나를 웃게 한 사람은?",
+        "마지막으로 절정의 행복을 느꼈을 때는 언제인가?",
+        "오늘 하루 중 기억에 남기고 싶은 것은?",
+        "오늘 하루와 어울리는 시나 노래의 구절을 적어보자.",
+        "오늘을 색깔로 표현해보자.",
+        "나에게 없어서는 안 되는 물건은?",
+        "내가 한 거짓말 중에 가장 큰 것은?",
+        "남모르게 간직한 열정이 있다면?",
+        "어렸을 때 나의 꿈은 무엇이었는가?",
+        "죽기 전에 꼭 하고 싶은 일이 있다면?",
+        "지금 어떤 색깔의 옷을 입고 있는가?",
+        "가장 편안하게 느껴지는 장소는?",
+        "오늘 새롭게 알게 된 사실을 적어보자.",
+        "노력 없이 한 가지 재능을 얻을 수 있다면 무엇을 고르겠는가?",
+        "나의 가장 큰 단점은 무엇인가?",
+        "절대 일어나지 않았으면 하는 일은?",
+        "딱 하루만 인생을 바꿀 수 있다면 누구와 바꾸겠는가?",
+        "내가 행복하게 만들어줄 수 있는 사람은 누구일까?",
+        "가장 좋아하는 꽃이나 식물이 있다면?",
+        "내 인생을 영화로 만든다면 주인공 역은 누구로 하고 싶은가?",
+        "내일 해야 할 일 중 미루고 싶은 일은 무엇인가?",
+        "마지막으로 참석한 모임은?",
+        "무슨 요일을 가장 좋아하는가? 그 이유는?",
+        "과거로 돌아가 꼭 바꾸고 싶은 일이 있다면?",
+        "사랑을 위해 저지른 가장 이상한 것은?",
+        "현재 나의 헤어스타일은?",
+        "내일 어디든 여행할 수 있다면 가고 싶은 곳은?",
+        "산과 바다 중 어느 곳이 더 좋은가?",
+        "지금 이 순간 가장 그리운 사람은?",
+        "마지막으로 먹은 과일은?",
+        "자서전을 쓴다면 첫 문장을 어떻게 쓰고 싶은가?",
+        "가장 최근에 만든 요리는?",
+        "봄, 여름, 가을, 겨울 중 내가 가장 좋아하는 계절은 무엇인가?",
+        "내가 가장 좋아하는 음식은 무엇인가?",
+        "이름을 바꿀 수 있다면 무엇으로 하고 싶은가?",
+        "소원 세 가지는?",
+      ];
+      document.getElementById("randomQuestion").textContent =
+        randomQuestions[Math.floor(Math.random() * randomQuestions.length)];
+
+      // 이미지 업로드
+      const imageUpload = document.getElementById("imageUpload");
+      const imageButton = document.getElementById("imageButton");
+      imageUpload.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imageButton.style.backgroundImage = `url(${e.target.result})`;
+            imageButton.setAttribute("data-selected", "true");
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // 날씨 선택
+      const weatherSelector = document.getElementById("weatherSelector");
+      weatherSelector.addEventListener("click", function (event) {
+        if (event.target.tagName === "IMG") {
+          [...weatherSelector.children].forEach((img) =>
+            img.classList.remove("selected")
+          );
+          event.target.classList.add("selected");
+        }
+      });
+
+      // 기분 선택
+      const moodSelector = document.getElementById("moodSelector");
+      moodSelector.addEventListener("click", function (event) {
+        if (event.target.tagName === "IMG") {
+          [...moodSelector.children].forEach((img) =>
+            img.classList.remove("selected")
+          );
+          event.target.classList.add("selected");
+        }
+      });
+
+      // 저장 버튼
+      document
+        .getElementById("save-btn")
+        .addEventListener("click", function () {
+          const wakeUpTime = document.getElementById("wake-up-time").value;
+          const sleepTime = document.getElementById("sleep-time").value;
+          const meal = document.getElementById("meal").value.trim();
+          const dailySummary = document
+            .getElementById("daily-summary")
+            .value.trim();
+          const answer = document.getElementById("answer").value.trim();
+          const weather =
+            document.querySelector("#weatherSelector img.selected")?.alt ||
+            "선택 안 됨";
+          const mood =
+            document.querySelector("#moodSelector img.selected")?.alt ||
+            "선택 안 됨";
+
+          const selectedDate = new URLSearchParams(window.location.search).get(
+            "date"
+          );
+          const diaryData = {
+            wakeUpTime,
+            sleepTime,
+            meal,
+            dailySummary,
+            answer,
+            weather,
+            mood,
+          };
+
+          if (wakeUpTime && sleepTime && meal && dailySummary && answer) {
+            localStorage.setItem(
+              `diary-${selectedDate}`,
+              JSON.stringify(diaryData)
+            ); // 로컬 저장소에 저장
+            document.getElementById("message").textContent = "저장 완료!";
+            document.getElementById("message").style.color = "green";
+          } else {
+            document.getElementById("message").textContent =
+              "모든 항목을 입력해주세요!";
+            document.getElementById("message").style.color = "red";
+          }
+        });
+      window.addEventListener("load", function () {
+        const selectedDate = new URLSearchParams(window.location.search).get(
+          "date"
+        );
+
+        const savedData = localStorage.getItem(`diary-${selectedDate}`);
+
+        if (savedData) {
+          const diaryData = JSON.parse(savedData);
+
+          // 로드된 데이터를 각 필드에 채우기
+          document.getElementById("wake-up-time").value = diaryData.wakeUpTime;
+          document.getElementById("sleep-time").value = diaryData.sleepTime;
+          document.getElementById("meal").value = diaryData.meal;
+          document.getElementById("daily-summary").value =
+            diaryData.dailySummary;
+          document.getElementById("answer").value = diaryData.answer;
+
+          // 날씨와 기분 선택 상태 복원
+          const weatherSelector = document.getElementById("weatherSelector");
+          const moodSelector = document.getElementById("moodSelector");
+
+          [...weatherSelector.children].forEach((img) => {
+            if (img.alt === diaryData.weather) {
+              img.classList.add("selected");
+            }
+          });
+
+          [...moodSelector.children].forEach((img) => {
+            if (img.alt === diaryData.mood) {
+              img.classList.add("selected");
+            }
+          });
+        }
+      });
+    </script>
+  </body>
+</html>
